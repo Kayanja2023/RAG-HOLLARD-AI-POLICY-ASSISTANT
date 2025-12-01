@@ -30,18 +30,18 @@ def add_styling():
         .stButton > button {
             background-color: #6B1E9E;
             color: white;
-            border-radius: 12px;
+            border-radius: 8px;
             border: none;
-            padding: 8px 16px;
-            font-size: 13px;
+            padding: 6px 14px;
+            font-size: 12px;
             font-weight: 500;
-            box-shadow: 0 2px 6px rgba(107, 30, 158, 0.12);
+            box-shadow: 0 1px 4px rgba(107, 30, 158, 0.1);
             transition: all 0.3s ease;
         }
         
         .stButton > button:hover {
             background-color: #5A1880;
-            box-shadow: 0 3px 10px rgba(107, 30, 158, 0.2);
+            box-shadow: 0 2px 8px rgba(107, 30, 158, 0.18);
             transform: translateY(-1px);
         }
         
@@ -50,9 +50,9 @@ def add_styling():
             background-color: #F5F5F5;
             color: #666666;
             border: 1px solid #E0E0E0;
-            padding: 4px 10px;
-            font-size: 12px;
-            border-radius: 12px;
+            padding: 3px 8px;
+            font-size: 11px;
+            border-radius: 8px;
             box-shadow: none;
         }
         
@@ -76,23 +76,23 @@ def add_styling():
         /* Sidebar headers - Hollard purple */
         [data-testid="stSidebar"] h2 {
             color: #6B1E9E;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         
         [data-testid="stSidebar"] h3 {
             color: #5A1880;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         
         /* File uploader styling */
         [data-testid="stFileUploader"] {
             border: 2px dashed #6B1E9E;
-            border-radius: 16px;
-            padding: 1rem;
+            border-radius: 10px;
+            padding: 0.75rem;
             background-color: #FFFFFF;
         }
         
@@ -125,9 +125,9 @@ def add_styling():
         
         /* Chat messages */
         .stChatMessage {
-            border-radius: 16px;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.4rem;
         }
         
         /* User messages - light purple */
@@ -162,32 +162,32 @@ def show_welcome_message(docs_exist, messages_exist):
         # First-time user - no documents, no chat
         st.markdown("""
             <div style='background: linear-gradient(135deg, #F9F5FC 0%, #FFFFFF 100%);
-                        padding: 24px;
-                        border-radius: 12px;
-                        border: 2px solid #E8D4F1;
-                        margin-bottom: 20px;
+                        padding: 18px;
+                        border-radius: 10px;
+                        border: 1px solid #E8D4F1;
+                        margin-bottom: 16px;
                         text-align: center;'>
-                <h2 style='color: #6B1E9E; margin: 0 0 12px 0; font-size: 1.3rem; font-weight: 600;'>
-                    <span style='font-size: 1.1rem;'>👋</span> Welcome to Hollard Policy Assistant!
+                <h2 style='color: #6B1E9E; margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600;'>
+                    <span style='font-size: 0.9rem;'>👋</span> Welcome to Hollard Policy Assistant!
                 </h2>
-                <p style='color: #5A1880; font-size: 0.95rem; line-height: 1.5; margin: 8px 0;'>
+                <p style='color: #5A1880; font-size: 0.85rem; line-height: 1.4; margin: 6px 0;'>
                     Get instant answers about Hollard insurance products and policies.
                 </p>
-                <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px;'>
-                    <div style='background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid #E8D4F1;'>
-                        <div style='font-size: 1.2rem; margin-bottom: 6px;'>📋</div>
-                        <strong style='color: #6B1E9E; font-size: 0.9rem;'>Policy Information</strong>
-                        <p style='color: #666666; font-size: 0.8rem; margin: 4px 0 0 0;'>Life, Disability, Business cover</p>
+                <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px;'>
+                    <div style='background: #FFFFFF; padding: 10px; border-radius: 6px; border: 1px solid #E8D4F1;'>
+                        <div style='font-size: 1rem; margin-bottom: 4px;'>📋</div>
+                        <strong style='color: #6B1E9E; font-size: 0.85rem;'>Policy Information</strong>
+                        <p style='color: #666666; font-size: 0.75rem; margin: 3px 0 0 0;'>Life, Disability, Business cover</p>
                     </div>
-                    <div style='background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid #E8D4F1;'>
-                        <div style='font-size: 1.2rem; margin-bottom: 6px;'>💬</div>
-                        <strong style='color: #6B1E9E; font-size: 0.9rem;'>Instant Answers</strong>
-                        <p style='color: #666666; font-size: 0.8rem; margin: 4px 0 0 0;'>Claims, terms, products</p>
+                    <div style='background: #FFFFFF; padding: 10px; border-radius: 6px; border: 1px solid #E8D4F1;'>
+                        <div style='font-size: 1rem; margin-bottom: 4px;'>💬</div>
+                        <strong style='color: #6B1E9E; font-size: 0.85rem;'>Instant Answers</strong>
+                        <p style='color: #666666; font-size: 0.75rem; margin: 3px 0 0 0;'>Claims, terms, products</p>
                     </div>
-                    <div style='background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid #E8D4F1;'>
-                        <div style='font-size: 1.2rem; margin-bottom: 6px;'>🔒</div>
-                        <strong style='color: #6B1E9E; font-size: 0.9rem;'>Secure & Private</strong>
-                        <p style='color: #666666; font-size: 0.8rem; margin: 4px 0 0 0;'>Your data stays protected</p>
+                    <div style='background: #FFFFFF; padding: 10px; border-radius: 6px; border: 1px solid #E8D4F1;'>
+                        <div style='font-size: 1rem; margin-bottom: 4px;'>🔒</div>
+                        <strong style='color: #6B1E9E; font-size: 0.85rem;'>Secure & Private</strong>
+                        <p style='color: #666666; font-size: 0.75rem; margin: 3px 0 0 0;'>Your data stays protected</p>
                     </div>
                 </div>
             </div>
@@ -222,19 +222,19 @@ def check_handover_needed(response_text: str) -> bool:
 def show_handover_end():
     """Display minimalistic handover end screen."""
     st.markdown("""
-        <div style='background: #F9F5FC; padding: 24px; border-radius: 12px; 
-                    border: 2px solid #6B1E9E; text-align: center; margin: 20px 0;'>
-            <div style='font-size: 1.8rem; margin-bottom: 12px;'>🤝</div>
-            <h3 style='color: #6B1E9E; margin: 0 0 8px 0; font-size: 1.1rem;'>Session Ended</h3>
-            <p style='color: #666; margin: 0 0 16px 0; font-size: 0.9rem;'>
+        <div style='background: #F9F5FC; padding: 18px; border-radius: 10px; 
+                    border: 2px solid #6B1E9E; text-align: center; margin: 16px 0;'>
+            <div style='font-size: 1.4rem; margin-bottom: 8px;'>🤝</div>
+            <h3 style='color: #6B1E9E; margin: 0 0 6px 0; font-size: 1rem;'>Session Ended</h3>
+            <p style='color: #666; margin: 0 0 12px 0; font-size: 0.85rem;'>
                 This conversation requires human assistance.
             </p>
-            <div style='background: white; padding: 16px; border-radius: 8px; margin: 12px 0;'>
-                <p style='color: #5A1880; margin: 0 0 12px 0; font-weight: 600; font-size: 0.9rem;'>Contact Options:</p>
-                <div style='text-align: left; color: #666; font-size: 0.85rem;'>
-                    <p style='margin: 6px 0;'><span style='font-size: 0.9rem;'>📞</span> <strong>Phone:</strong> 0860 103 933</p>
-                    <p style='margin: 6px 0;'><span style='font-size: 0.9rem;'>✉️</span> <strong>Email:</strong> info@hollard.co.za</p>
-                    <p style='margin: 6px 0;'><span style='font-size: 0.9rem;'>🔍</span> <strong>Find a Broker:</strong> 
+            <div style='background: white; padding: 12px; border-radius: 6px; margin: 10px 0;'>
+                <p style='color: #5A1880; margin: 0 0 10px 0; font-weight: 600; font-size: 0.85rem;'>Contact Options:</p>
+                <div style='text-align: left; color: #666; font-size: 0.8rem;'>
+                    <p style='margin: 5px 0;'><span style='font-size: 0.85rem;'>📞</span> <strong>Phone:</strong> 0860 103 933</p>
+                    <p style='margin: 5px 0;'><span style='font-size: 0.85rem;'>✉️</span> <strong>Email:</strong> info@hollard.co.za</p>
+                    <p style='margin: 5px 0;'><span style='font-size: 0.85rem;'>🔍</span> <strong>Find a Broker:</strong> 
                         <a href='https://www.hollard.co.za/broker-tool' target='_blank' 
                            style='color: #6B1E9E; text-decoration: none;'>hollard.co.za/broker-tool</a>
                     </p>
@@ -249,21 +249,21 @@ def show_handover_end():
 def show_header():
     st.markdown("""
         <div style='background: linear-gradient(135deg, #6B1E9E 0%, #5A1880 100%); 
-                    padding: 16px 24px; 
-                    border-radius: 12px; 
-                    margin-bottom: 20px;
-                    box-shadow: 0 3px 12px rgba(107, 30, 158, 0.15);
+                    padding: 12px 20px; 
+                    border-radius: 10px; 
+                    margin-bottom: 16px;
+                    box-shadow: 0 2px 8px rgba(107, 30, 158, 0.12);
                     display: flex;
                     align-items: center;
-                    gap: 12px;'>
+                    gap: 10px;'>
             <div style='flex: 0 0 auto;'>
-                <img src="https://www.hollard.co.za/_next/static/media/hollard-footer-default.9ed7fd46.svg" alt="Hollard" style="height: 36px; width: auto; display: block;">
+                <img src="https://www.hollard.co.za/_next/static/media/hollard-footer-default.9ed7fd46.svg" alt="Hollard" style="height: 30px; width: auto; display: block;">
             </div>
             <div style='flex: 1; text-align: left;'>
-                <h1 style='color: #FFFFFF; margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: 0.3px;'>
+                <h1 style='color: #FFFFFF; margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.2px;'>
                     Hollard Policy Assistant
                 </h1>
-                <p style='color: #E8D4F1; margin: 2px 0 0 0; font-size: 0.8rem; font-weight: 400;'>
+                <p style='color: #E8D4F1; margin: 2px 0 0 0; font-size: 0.75rem; font-weight: 400;'>
                     Your Policy Knowledge Partner
                 </p>
             </div>
