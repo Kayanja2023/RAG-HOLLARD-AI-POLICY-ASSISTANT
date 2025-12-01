@@ -1,111 +1,104 @@
-# RAG Chatbot - Production-Grade Document QA System
+# Hollard Policy Assistant 🛡️
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/streamlit-1.22+-red.svg)](https://streamlit.io/)
-[![LangChain](https://img.shields.io/badge/langchain-1.0+-green.svg)](https://www.langchain.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+A Retrieval-Augmented Generation (RAG) chatbot designed to help users get instant answers about Hollard Insurance products, policies, and claims procedures. Built with Streamlit, LangChain, and OpenAI GPT-4.
 
-A production-ready Retrieval-Augmented Generation (RAG) chatbot leveraging OpenAI's GPT-4, FAISS vector search, and LangChain's orchestration framework. Designed for enterprise document management with robust error handling, atomic file operations, and persistent conversation memory.
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [System Architecture](#system-architecture)
-- [Quick Start](#quick-start)
-- [Deployment](#deployment)
-- [Project Structure](#project-structure)
-- [Configuration Options](#configuration-options)
-- [Key Features & Implementation](#key-features--implementation)
-- [RAG Pipeline Deep Dive](#rag-pipeline-deep-dive)
-- [Development & Testing](#development--testing)
-- [Troubleshooting](#troubleshooting)
-- [Performance Characteristics](#performance-characteristics)
-- [Security Considerations](#security-considerations)
-- [Advanced Usage](#advanced-usage)
-- [Technical Stack](#technical-stack)
-- [Contributing](#contributing)
-- [License](#license)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/streamlit-1.30+-red.svg)](https://streamlit.io/)
+[![LangChain](https://img.shields.io/badge/langchain-latest-green.svg)](https://www.langchain.com/)
+[![Tests](https://img.shields.io/badge/tests-75%20passing-brightgreen.svg)](#testing)
+[![Coverage](https://img.shields.io/badge/coverage-77%25-yellow.svg)](#test-coverage)
 
 ---
 
-## Overview
+## 📖 Table of Contents
 
-This application implements a sophisticated RAG pipeline that enables users to:
-- Upload and index documents in multiple formats (TXT, PDF, DOCX, Markdown)
-- Query document content using natural language
-- Maintain contextual conversation history across sessions
-- Manage document lifecycle with atomic operations and duplicate prevention
+- [Features](#-features)
+- [System Architecture](#-system-architecture)
+- [Quick Start](#-quick-start)
+- [Configuration](#-configuration)
+- [Knowledge Base](#-knowledge-base)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
 
-### Key Differentiators
-- **Atomic File Operations**: Prevents data corruption during concurrent uploads
-- **Smart Duplicate Detection**: Content-hash based file signature tracking
-- **Persistent Chat Memory**: Conversation history survives document deletions
-- **Zero-Downtime Updates**: Generation-based UI state management prevents infinite loops
-- **Graceful Degradation**: Chat interface remains accessible even without documents
+---
+
+## ✨ Features
+
+### Core Functionality
+- **💬 Intelligent Chat Interface**: Ask questions about Hollard products, claims, and policies in natural language
+- **📚 RAG-Powered Responses**: Uses FAISS vector search to retrieve relevant information from knowledge base
+- **🔄 Conversation Memory**: Maintains context throughout the conversation for more natural interactions
+- **📱 Responsive UI**: Clean, mobile-friendly interface with Hollard branding
+
+### Smart Features
+- **🤝 Handover Mechanism**: Automatically detects when human assistance is needed (quotes, purchases, complaints)
+- **🛡️ Session Management**: Ends session gracefully when handover is triggered, displays contact information
+- **📄 Multi-Format Support**: Processes TXT, PDF, DOCX, and Markdown documents
+- **🎨 Hollard Branding**: Purple-themed UI with official Hollard logo and Better Futures mission alignment
+
+### Knowledge Base
+The assistant has knowledge about:
+- Life Insurance, Disability Cover, Critical Illness Insurance
+- Short-term Insurance (Car, Home, Business)
+- Claims procedures and required documentation
+- Company information and Better Futures initiative
+- Broker network and how to find assistance
 
 ---
 
 ## 🏗️ System Architecture
 
-### High-Level Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Streamlit Frontend                       │
-│  ┌────────────────┐    ┌──────────────┐    ┌─────────────────┐ │
-│  │ Upload Widget  │───▶│ Chat Interface│◀───│ Document Manager│ │
-│  └────────────────┘    └──────────────┘    └─────────────────┘ │
-└───────────────────┬─────────────────────────────────┬───────────┘
-                    │                                 │
-                    ▼                                 ▼
-        ┌────────────────────────┐       ┌────────────────────┐
-        │   RAG Engine Layer     │       │   Config Layer     │
-        │  ┌──────────────────┐  │       │  ┌──────────────┐  │
-        │  │ Document Loader  │  │       │  │ File Manager │  │
-        │  │ Text Chunker     │  │       │  │ Validator    │  │
-        │  │ Vector Store     │  │       │  │ Atomic Write │  │
-        │  │ LLM Chain        │  │       │  └──────────────┘  │
-        │  └──────────────────┘  │       └────────────────────┘
-        └────────────────────────┘
-                    │
-                    ▼
-        ┌────────────────────────┐
-        │   External Services    │
-        │  ┌──────────────────┐  │
-        │  │ OpenAI API       │  │
-        │  │ - Embeddings     │  │
-        │  │ - Chat LLM       │  │
-        │  └──────────────────┘  │
-        └────────────────────────┘
+```mermaid
+graph TB
+    subgraph "User Interface"
+        A[Streamlit Frontend] -->|User Query| B[Chat Input]
+        A -->|Upload| C[Document Upload]
+    end
+    
+    subgraph "Document Processing"
+        C -->|Validate| D[File Validator]
+        D -->|Parse| E[Document Loaders]
+        E -->|Split| F[Text Chunking]
+        F -->|Embed| G[OpenAI Embeddings]
+        G -->|Store| H[(FAISS Vector Store)]
+    end
+    
+    subgraph "RAG Pipeline"
+        B -->|Search| H
+        H -->|Retrieve| I[Context Retriever]
+        I -->|Top-K Results| J[System Prompt]
+        B -->|User Input| J
+        J -->|Augmented Query| K[GPT-4 Model]
+        K -->|Response| L[Handover Detection]
+    end
+    
+    subgraph "Response Handling"
+        L -->|Normal Response| M[Display Answer]
+        L -->|Handover Needed| N[End Session Screen]
+        N -->|Show| O[Contact Options]
+    end
+    
+    subgraph "Session State"
+        P[Message History] -.->|Context| J
+        M -.->|Update| P
+        Q[Session Flags] -.->|Check| L
+    end
+    
+    style A fill:#6B1E9E,color:#fff
+    style H fill:#E8D4F1,color:#000
+    style K fill:#5A1880,color:#fff
+    style N fill:#F9F5FC,color:#000
 ```
 
 ### Data Flow
 
-```
-Upload → Validation → Signature → Duplicate Check → Atomic Write
-                                                          │
-                                                          ▼
-                                            Document Storage (data/documents/)
-                                                          │
-                                                          ▼
-                                            Document Loader (Multi-format)
-                                                          │
-                                                          ▼
-                                            Text Splitter (Chunking)
-                                                          │
-                                                          ▼
-                                            Embeddings (OpenAI text-embedding-3-small)
-                                                          │
-                                                          ▼
-                                            Vector Store (FAISS Index)
-                                                          │
-User Query → Retriever → Context Injection → LLM → Response
-              │                               │
-              └───────────────────────────────┘
-                   (Top-K Similar Chunks)
-```
+1. **Document Ingestion**: User uploads policy documents → Validated → Chunked → Embedded → Stored in FAISS
+2. **Query Processing**: User question → Vector search → Top-K relevant chunks retrieved
+3. **Context Augmentation**: Retrieved chunks + conversation history + system prompt → GPT-4
+4. **Response Generation**: GPT-4 generates answer → Handover detection → Display or end session
+5. **Memory Management**: All messages stored in session state for conversation continuity
 
 ---
 
@@ -113,673 +106,378 @@ User Query → Retriever → Context Injection → LLM → Response
 
 ### Prerequisites
 
-- **Python**: 3.8 or higher
-- **OpenAI API Key**: Required for embeddings and chat completion
-- **Virtual Environment**: Recommended for dependency isolation
+- Python 3.11 or higher
+- OpenAI API key
+- Git
 
 ### Installation
 
-```powershell
-# Clone the repository
-git clone <repository-url>
+1. **Clone the repository**
+```bash
+git clone https://github.com/Kayanja2023/Rag.git
 cd Rag
+```
 
-# Create and activate virtual environment
+2. **Create virtual environment**
+```bash
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # Mac/Linux
+```
 
-# Install dependencies
+3. **Install dependencies**
+```bash
 pip install -r requirements.txt
 ```
 
-### Configuration
-
-Create a `.env` file in the project root:
-
-```env
-OPENAI_API_KEY=sk-your-openai-api-key-here
+4. **Set up environment variables**
+```bash
+# Create .env file
+echo OPENAI_API_KEY=your_api_key_here > .env
 ```
 
-### Running the Application
-
-```powershell
+5. **Run the application**
+```bash
 streamlit run app.py
 ```
 
-Access the application at: `http://localhost:8501`
+The app will open in your browser at `http://localhost:8501`
 
 ---
 
-## Deployment
+## ⚙️ Configuration
 
-### Deploying to Streamlit Cloud
-
-This application is designed for easy deployment to Streamlit Cloud (formerly Streamlit Sharing).
-
-#### Step 1: Push to GitHub
-
-Ensure your code is pushed to a GitHub repository:
-
-```powershell
-git add .
-git commit -m "Prepare for deployment"
-git push origin main
-```
-
-#### Step 2: Deploy on Streamlit Cloud
-
-1. Go to [share.streamlit.io](https://share.streamlit.io)
-2. Sign in with your GitHub account
-3. Click "New app"
-4. Select your repository: `Kayanja2023/Rag`
-5. Set main file path: `app.py`
-6. Set branch: `main`
-
-#### Step 3: Configure Secrets
-
-**CRITICAL**: You must configure the OpenAI API key as a secret in Streamlit Cloud:
-
-1. In your app dashboard, click "Settings" (⚙️)
-2. Navigate to "Secrets" section
-3. Add your secrets in TOML format:
-
-```toml
-OPENAI_API_KEY = "sk-your-actual-openai-api-key-here"
-```
-
-4. Click "Save"
-
-#### Step 4: Deploy
-
-Click "Deploy" and wait for the application to start. The deployment process will:
-- Clone your repository
-- Install dependencies from `requirements.txt`
-- Start the Streamlit application
-
-**Note**: The initial deployment may take 2-5 minutes as it installs all dependencies.
-
-### Deployment Checklist
-
-Before deploying, ensure:
-
-- [ ] Repository is public or Streamlit Cloud has access
-- [ ] `requirements.txt` is present and up-to-date
-- [ ] `OPENAI_API_KEY` is configured in Streamlit Cloud secrets
-- [ ] `.env` file is listed in `.gitignore` (never commit API keys!)
-- [ ] `data/` directory is in `.gitignore` (documents are user-specific)
-- [ ] Code is tested locally before deployment
-
-### Troubleshooting Deployment
-
-#### ❌ Error: `OpenAIError: The api_key client option must be set`
-
-**This is the most common deployment error!**
-
-**Root Cause**: The OpenAI API key is not configured in Streamlit Cloud secrets.
-
-**Solution**: 
-1. Go to [share.streamlit.io](https://share.streamlit.io)
-2. Click your app → **Settings** (⚙️) → **Secrets**
-3. Add in TOML format:
-   ```toml
-   OPENAI_API_KEY = "sk-your-actual-key-here"
-   ```
-4. Click **Save** and wait for automatic reboot (~30 seconds)
-
-**Verification**: Check the logs - you should see the app start successfully without the OpenAI error.
-
-**Error**: `ModuleNotFoundError: No module named 'X'`
-
-**Solution**: Ensure the missing package is in `requirements.txt`
-
-**Error**: App crashes after document upload
-
-**Solution**: Streamlit Cloud has limited storage. Documents are ephemeral and will be lost on reboot.
-
-### Environment-Specific Configuration
-
-For production deployments, consider:
+Edit `config.py` to customize settings:
 
 ```python
-# config.py - Add environment detection
-import os
+# Document Processing
+CHUNK_SIZE = 1000          # Characters per chunk
+CHUNK_OVERLAP = 200        # Overlap between chunks
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
 
-# Use temp directories in cloud environments
-if os.environ.get("STREAMLIT_RUNTIME_ENV") == "cloud":
-    DOCS_DIR = "/tmp/documents"
-    FAISS_DIR = "/tmp/faiss_store"
-else:
-    DOCS_DIR = os.path.join(os.path.dirname(__file__), "data", "documents")
-    FAISS_DIR = os.path.join(os.path.dirname(__file__), "data", "faiss_store")
+# Model Settings
+MODEL = "gpt-4"            # OpenAI model
+TEMPERATURE = 0.7          # Response creativity (0-1)
+SEARCH_K = 3               # Number of chunks to retrieve
+
+# Supported formats
+ALLOWED_EXTENSIONS = ["txt", "pdf", "docx", "md"]
 ```
 
-### Monitoring Deployed Application
+---
 
-- **Logs**: View real-time logs in Streamlit Cloud dashboard
-- **Status**: Check app status and resource usage
-- **Analytics**: Monitor user interactions (requires Streamlit for Teams)
+## 📚 Knowledge Base
+
+The assistant comes pre-loaded with 5 comprehensive documents:
+
+| Document | Content | Word Count |
+|----------|---------|------------|
+| `hollard-products-overview.md` | All insurance products (Life, Disability, Business, etc.) | ~2,800 |
+| `hollard-faqs.md` | Frequently asked questions from website | ~1,800 |
+| `life-insurance-basics.md` | Complete guide to life insurance | ~3,500 |
+| `claims-process.md` | Step-by-step claim procedures | ~3,000 |
+| `about-hollard.md` | Company info, Better Futures mission | ~2,200 |
+
+**Total Knowledge Base**: ~13,000 words covering Hollard's products, services, and processes.
+
+### Adding Documents
+
+1. Upload via the sidebar in the app
+2. Or manually place files in `data/documents/`
+3. Restart app to rebuild vector store
+
+---
+
+## 🧪 Testing
+
+### Run All Tests
+
+```bash
+# Using unittest
+python -m unittest discover -s tests -p "test_*.py" -v
+
+# Run specific test file
+python -m unittest tests.test_config -v
+```
+
+### Test Coverage
+
+```bash
+# Run tests with coverage
+python -m coverage run --source=. -m unittest discover -s tests -p "test_*.py"
+
+# View report in terminal
+python -m coverage report
+
+# Generate HTML report
+python -m coverage html
+start htmlcov\index.html  # Windows
+```
+
+**Current Coverage**: 77% (669/869 statements)
+
+### Test Suite Breakdown
+
+- **test_config.py** (22 tests): Configuration validation, file operations, atomic writes
+- **test_utils.py** (10 tests): Text extraction from various formats
+- **test_rag_engine.py** (18 tests): Document loading, embeddings, vector store
+- **test_app_functions.py** (19 tests): Handover detection, session management, UI logic
+
+---
+
+## 🚀 Deployment
+
+### Deploy to Streamlit Community Cloud
+
+1. **Push to GitHub**
+```bash
+git push origin feature/policy-assistant-poc
+# Or merge to main first
+```
+
+2. **Deploy on Streamlit**
+   - Go to https://share.streamlit.io/
+   - Click "New app"
+   - Select repository: `Kayanja2023/Rag`
+   - Branch: `feature/policy-assistant-poc` (or `main`)
+   - Main file: `app.py`
+   - Click "Deploy"
+
+3. **Add Secrets**
+   - In Streamlit Cloud dashboard
+   - Go to app settings → Secrets
+   - Add: `OPENAI_API_KEY = "your_key_here"`
+
+### Environment Variables
+
+Required:
+- `OPENAI_API_KEY`: Your OpenAI API key
+
+Optional:
+- `DOCS_DIR`: Custom document directory path
+- `FAISS_DIR`: Custom vector store path
 
 ---
 
 ## 📁 Project Structure
 
 ```
-rag-chatbot/
-│
-├── app.py                      # Main Streamlit application (UI & orchestration)
-├── rag_engine.py              # RAG pipeline (embeddings, retrieval, LLM chain)
-├── config.py                  # Configuration & file management utilities
-├── utils.py                   # Document text extraction utilities
-├── requirements.txt           # Python dependencies
-├── .env                       # Environment variables (create manually)
-├── .env.example              # Environment template
+Rag/
+├── app.py                          # Main Streamlit application
+├── rag_engine.py                   # RAG pipeline and chat chain
+├── config.py                       # Configuration settings
+├── utils.py                        # Text extraction utilities
+├── requirements.txt                # Python dependencies
+├── .env                           # Environment variables (not in repo)
+├── .gitignore                     # Git ignore rules
 │
 ├── data/
-│   ├── documents/            # Uploaded document storage (git-ignored)
-│   └── faiss_store/          # FAISS vector index (git-ignored)
+│   ├── documents/                 # Knowledge base files
+│   │   ├── hollard-products-overview.md
+│   │   ├── hollard-faqs.md
+│   │   ├── life-insurance-basics.md
+│   │   ├── claims-process.md
+│   │   └── about-hollard.md
+│   └── faiss_store/              # Vector embeddings
+│       └── index.faiss
 │
-└── __pycache__/              # Python bytecode cache
-```
-
-### Module Responsibilities
-
-#### `app.py` - Application Layer
-- **Streamlit UI**: Chat interface, file uploader, document list
-- **Session State Management**: Upload tracking, conversation history
-- **Upload Orchestration**: Signature generation, duplicate detection, atomic processing
-- **Error Handling**: User-facing error messages and recovery
-
-#### `rag_engine.py` - Core RAG Pipeline
-- **Document Loading**: Multi-format loader (TXT, PDF, DOCX, Markdown)
-- **Text Chunking**: Recursive character text splitter with overlap
-- **Embeddings**: OpenAI text-embedding-3-small (cached)
-- **Vector Store**: FAISS index creation and management (cached)
-- **LLM Chain**: Conversational retrieval chain with memory
-
-#### `config.py` - Configuration & Utilities
-- **Path Configuration**: Document and FAISS directories
-- **RAG Parameters**: Chunk size, model selection, temperature
-- **File Management**: Validation, atomic writes, unique naming
-- **Document Operations**: CRUD operations with error handling
-
-#### `utils.py` - Document Processing
-- **Text Extraction**: Format-specific parsers (PDF, DOCX, TXT, MD)
-- **Error Handling**: Graceful fallbacks for corrupted files
-
----
-
-## ⚙️ Configuration Options
-
-### Environment Variables (`.env`)
-
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `OPENAI_API_KEY` | ✅ Yes | OpenAI API authentication key | `sk-proj-...` |
-
-### Application Configuration (`config.py`)
-
-#### RAG Pipeline Parameters
-
-```python
-# Text Chunking
-CHUNK_SIZE = 1000          # Characters per chunk (balance: context vs. precision)
-CHUNK_OVERLAP = 200        # Overlap between chunks (preserves semantic continuity)
-
-# LLM Configuration
-MODEL = "gpt-4"            # Options: gpt-4, gpt-4-turbo, gpt-3.5-turbo
-TEMPERATURE = 0.7          # Response creativity (0.0=deterministic, 1.0=creative)
-
-# Retrieval Parameters
-SEARCH_K = 3               # Number of relevant chunks to retrieve per query
-```
-
-#### File Constraints
-
-```python
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB per file
-ALLOWED_EXTENSIONS = ["txt", "pdf", "docx", "md"]
-```
-
-### Performance Tuning Guidelines
-
-| Use Case | Chunk Size | Search K | Temperature | Model |
-|----------|------------|----------|-------------|-------|
-| Technical Docs | 1500 | 5 | 0.3 | gpt-4 |
-| Legal Documents | 2000 | 7 | 0.2 | gpt-4 |
-| General Knowledge | 1000 | 3 | 0.7 | gpt-3.5-turbo |
-| Creative Content | 800 | 4 | 0.9 | gpt-4 |
-
----
-
-## 🔧 Key Features & Implementation Details
-
-### 1. Atomic File Uploads
-
-**Problem**: Concurrent uploads or crashes can corrupt files.
-
-**Solution**: Atomic write-then-rename pattern
-```python
-# Write to temporary file
-with open(tmp_path, "wb") as f:
-    f.write(data)
-
-# Atomic rename (OS-level operation)
-tmp_path.replace(dest_path)  # Works on Windows & POSIX
-```
-
-**Benefits**:
-- No partial writes
-- Crash-safe operations
-- Thread-safe file creation
-
-### 2. Smart Duplicate Detection
-
-**Problem**: Re-uploading identical files wastes resources.
-
-**Solution**: Content-hash based signatures
-```python
-signature = (filename, size, mime_type, content_hash[:8])
-```
-
-**Features**:
-- Detects identical files with different names
-- Prevents vector store redundancy
-- Session-persistent tracking (last 50 uploads)
-
-### 3. Generation-Based UI State Management
-
-**Problem**: Streamlit re-runs cause infinite upload loops.
-
-**Solution**: Generation counters reset widget state
-```python
-key=f"uploader_{st.session_state.upload_generation}"
-st.session_state.upload_generation += 1  # Reset after save
-```
-
-**Benefits**:
-- Clean UI after successful uploads
-- Prevents stale file handles
-- User-friendly "auto-clear" behavior
-
-### 4. Persistent Chat History
-
-**Problem**: Chat history disappears on document deletion or page refresh.
-
-**Solution**: Backup-restore pattern + decoupled state
-```python
-# Backup before destructive operations
-messages_backup = st.session_state.messages.copy()
-session_histories_backup = st.session_state.session_histories.copy()
-
-# Perform operation
-st.cache_resource.clear()
-
-# Restore chat history
-st.session_state.messages = messages_backup
-st.session_state.session_histories = session_histories_backup
-```
-
-### 5. Graceful Degradation
-
-**Problem**: App becomes unusable when no documents exist.
-
-**Solution**: Conditional UI rendering
-- Chat history always visible (even without documents)
-- Input disabled with helpful message
-- Re-enables automatically when documents uploaded
-
----
-
-## 🔍 RAG Pipeline Deep Dive
-
-### Document Ingestion Pipeline
-
-```python
-# 1. Document Loading (format-aware)
-TextLoader → PyPDFLoader → Docx2txtLoader
-              ↓
-         Raw Documents
-
-# 2. Text Chunking (semantic preservation)
-RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200,  # Prevents context loss at boundaries
-    separators=["\n\n", "\n", ". ", " ", ""]
-)
-              ↓
-         Text Chunks (with metadata)
-
-# 3. Embedding Generation (cached)
-OpenAI text-embedding-3-small (1536 dimensions)
-              ↓
-         Vector Embeddings
-
-# 4. Index Creation (optimized for similarity search)
-FAISS Index (L2 distance metric)
-              ↓
-         Persistent Vector Store
-```
-
-### Query Processing Pipeline
-
-```python
-# 1. User Query
-"What are the main conclusions in the report?"
-              ↓
-# 2. Query Embedding
-OpenAI text-embedding-3-small
-              ↓
-# 3. Similarity Search
-FAISS retriever (top-k=3 chunks)
-              ↓
-# 4. Context Assembly
-format_docs(retrieved_chunks) → Combined context string
-              ↓
-# 5. Prompt Construction
-ChatPromptTemplate([
-    system_message + context,
-    conversation_history,
-    user_query
-])
-              ↓
-# 6. LLM Invocation
-GPT-4 (with conversation memory)
-              ↓
-# 7. Response Streaming
-StrOutputParser → User-facing response
-```
-
-### Conversation Memory Architecture
-
-```python
-# Session-based memory (isolated per user)
-RunnableWithMessageHistory(
-    chain=rag_chain,
-    get_session_history=lambda sid: session_histories[sid],
-    input_messages_key="input",
-    history_messages_key="chat_history"
-)
-```
-
-**Memory Persistence**:
-- Stored in `st.session_state.session_histories`
-- Survives document operations (backup-restore)
-- Cleared only on explicit user action
-
----
-
-## 🛠️ Development & Testing
-
-### Running in Development Mode
-
-```powershell
-# Enable hot reload
-streamlit run app.py --server.runOnSave true
-
-# Custom port
-streamlit run app.py --server.port 8502
-```
-
-### Manual Testing Checklist
-
-- [ ] Upload single file (each format: TXT, PDF, DOCX, MD)
-- [ ] Upload multiple files simultaneously
-- [ ] Upload duplicate file (should auto-rename)
-- [ ] Delete document (verify chat history persists)
-- [ ] Delete all documents (verify input disabled, history visible)
-- [ ] Ask question and verify relevant response
-- [ ] Test conversation memory (multi-turn dialogue)
-- [ ] Clear chat history (verify clean slate)
-
-### Common Edge Cases
-
-1. **Large File Upload (>50MB)**: Should show validation error
-2. **Corrupted PDF**: Graceful error with fallback parsing
-3. **Empty Document**: Should process but may produce poor retrieval
-4. **Special Characters in Filename**: Handled by unique naming
-5. **Concurrent Uploads**: Atomic writes prevent corruption
-
----
-
-## 🚨 Troubleshooting
-
-### Issue: FAISS Dimension Mismatch
-
-**Symptom**: `AssertionError: Index dimension mismatch`
-
-**Cause**: Embedding model changed after index creation
-
-**Solution**:
-```powershell
-# Delete existing index
-Remove-Item -Path "data\faiss_store\*" -Force -Recurse
-
-# Restart app (will rebuild index automatically)
-streamlit run app.py
-```
-
-### Issue: OpenAI API Rate Limit
-
-**Symptom**: `RateLimitError: You exceeded your current quota`
-
-**Solutions**:
-1. Check API key billing status
-2. Reduce `SEARCH_K` (fewer chunks = fewer tokens)
-3. Switch to `gpt-3.5-turbo` (cheaper model)
-4. Add exponential backoff retry logic
-
-### Issue: Slow Document Processing
-
-**Symptom**: Long wait times during upload
-
-**Diagnosis**:
-```python
-# Add timing diagnostics
-import time
-start = time.time()
-chunks = splitter.split_documents(docs)
-print(f"Chunking took {time.time() - start:.2f}s")
-```
-
-**Solutions**:
-- Reduce `CHUNK_SIZE` for faster processing
-- Process documents asynchronously (advanced)
-- Use smaller embedding model (trade-off: accuracy)
-
-### Issue: Memory Leak (Long-Running Session)
-
-**Symptom**: Streamlit becomes slow over time
-
-**Solution**:
-```python
-# Periodic cleanup in config.py (already implemented)
-if len(st.session_state.processed_uploads) > 50:
-    st.session_state.processed_uploads = dict(sorted_items[-50:])
+├── tests/
+│   ├── __init__.py
+│   ├── test_config.py            # Config & file operation tests
+│   ├── test_utils.py             # Utility function tests
+│   ├── test_rag_engine.py        # RAG pipeline tests
+│   ├── test_app_functions.py     # UI logic tests
+│   └── README.md                 # Test documentation
+│
+└── assets/
+    └── pngegg.jpg                # Hollard logo (fallback)
 ```
 
 ---
 
-## 📊 Performance Characteristics
+## 🔧 How It Works
 
-### Scalability Limits
+### RAG Pipeline Explained
 
-| Metric | Recommended | Maximum | Notes |
-|--------|-------------|---------|-------|
-| Documents | 100-500 | 1000 | FAISS performs well in-memory |
-| Total Size | <500MB | 2GB | Limited by server RAM |
-| Chunk Count | 5k-10k | 50k | Retrieval latency increases linearly |
-| Concurrent Users | 1 | 5 | Streamlit single-threaded by default |
+1. **Document Loading**
+   - Files uploaded via UI or placed in `data/documents/`
+   - Loaded using LangChain loaders (TextLoader, PyPDFLoader, Docx2txtLoader)
+   
+2. **Text Chunking**
+   - Documents split into 1000-character chunks with 200-char overlap
+   - Ensures context continuity across chunks
+   
+3. **Embedding Generation**
+   - Each chunk converted to vector using OpenAI's `text-embedding-3-small`
+   - Stored in FAISS for fast similarity search
+   
+4. **Query Processing**
+   - User question embedded to vector
+   - FAISS finds top-3 most similar chunks
+   
+5. **Context Augmentation**
+   - Retrieved chunks + conversation history + system prompt
+   - Sent to GPT-4 for answer generation
+   
+6. **Response Handling**
+   - GPT-4 response checked for handover triggers
+   - Normal response: displayed in chat
+   - Handover needed: session ends, contact info shown
 
-### Latency Benchmarks
+### Handover Mechanism
 
-| Operation | Typical | Fast | Slow |
-|-----------|---------|------|------|
-| Single File Upload | 2s | 1s | 5s |
-| Index Rebuild (100 docs) | 15s | 10s | 30s |
-| Query Response | 3s | 2s | 8s |
-| Document Deletion | <1s | 0.5s | 2s |
+The system detects when questions require human assistance:
 
-*Tested on: Intel i7, 16GB RAM, 50Mbps connection*
+**Triggers**:
+- Requesting quotes or purchases
+- Account-specific queries
+- Claim submissions
+- Complaints or urgent issues
+- Policy changes
 
----
+**Detection phrases**:
+- "connect you with"
+- "hand you over"
+- "live agent"
+- "Hollard specialist"
 
-## 🔐 Security Considerations
-
-### Current Implementation
-
-✅ **Secure**:
-- API keys in environment variables (not hardcoded)
-- File type validation (prevents arbitrary code execution)
-- Atomic writes (prevents race conditions)
-
-⚠️ **Considerations for Production**:
-- No authentication/authorization (anyone can access)
-- No encryption at rest (documents stored plaintext)
-- No rate limiting (vulnerable to abuse)
-- OpenAI API key exposed to server (not user-isolated)
-
-### Production Hardening Recommendations
-
-```python
-# 1. Add user authentication
-import streamlit_authenticator as stauth
-
-# 2. Encrypt documents at rest
-from cryptography.fernet import Fernet
-
-# 3. Add rate limiting
-from slowapi import Limiter
-
-# 4. Implement user-specific storage
-DOCS_DIR = f"data/documents/{user_id}/"
-
-# 5. Sanitize file inputs
-import bleach
-filename = bleach.clean(uploaded_file.name)
-```
+**Action**: Session ends, displays contact card with:
+- Phone: 0860 103 933
+- Email: info@hollard.co.za
+- Broker finder link
 
 ---
 
-## 🧪 Advanced Usage
+## 🎨 UI Features
 
-### Custom Prompt Engineering
+### Hollard Branding
+- **Colors**: Purple (#6B1E9E), Light Purple (#E8D4F1), White
+- **Logo**: Official Hollard SVG from website
+- **Tagline**: "Your Policy Knowledge Partner"
+- **Icon**: 🛡️ (shield emoji)
 
-Edit the system prompt in `rag_engine.py`:
-
-```python
-prompt = ChatPromptTemplate.from_messages([
-    ("system", """You are a domain-specific expert assistant.
-
-Guidelines:
-- Cite source documents when providing answers
-- Indicate confidence level (high/medium/low)
-- Suggest follow-up questions for clarification
-
-Context: {context}
-Documents: {document_list}
-"""),
-    MessagesPlaceholder(variable_name="chat_history"),
-    ("human", "{input}")
-])
-```
-
-### Multi-Index Support
-
-```python
-# Create separate indexes per document type
-def load_vector_store(doc_type="all"):
-    if doc_type == "all":
-        return FAISS.load_local(FAISS_DIR, embeddings)
-    else:
-        return FAISS.load_local(f"{FAISS_DIR}_{doc_type}", embeddings)
-```
-
-### Hybrid Search (Keyword + Semantic)
-
-```python
-from langchain.retrievers import EnsembleRetriever
-from langchain.retrievers import BM25Retriever
-
-# Combine sparse (BM25) and dense (FAISS) retrievers
-bm25_retriever = BM25Retriever.from_documents(docs)
-ensemble_retriever = EnsembleRetriever(
-    retrievers=[bm25_retriever, faiss_retriever],
-    weights=[0.3, 0.7]
-)
-```
+### User Experience
+- **Welcome Cards**: Contextual welcome based on app state
+- **Loading States**: Spinner during document analysis
+- **Clear Chat**: Reset conversation anytime
+- **Disabled States**: Chat disabled when no documents loaded
+- **Session End**: Clean handover screen with contact options
 
 ---
 
-## 📚 Technical Stack
+## 🛠️ Tech Stack
 
-### Core Dependencies
-
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `streamlit` | 1.22+ | Web UI framework |
-| `langchain` | 1.0+ | RAG orchestration |
-| `langchain-openai` | 1.0+ | OpenAI integrations |
-| `faiss-cpu` | 1.7+ | Vector similarity search |
-| `pdfplumber` | 0.7+ | PDF text extraction |
-| `python-docx` | 0.8+ | DOCX parsing |
-| `python-dotenv` | 1.0+ | Environment management |
-
-### Architecture Patterns
-
-- **Caching Strategy**: `@st.cache_resource` for embeddings & vector store
-- **State Management**: Streamlit session state for UI persistence
-- **Error Handling**: Try-except with user-friendly messages
-- **File I/O**: Atomic operations with temp files
-- **Memory Management**: LRU-style tracking with size limits
+| Category | Technology |
+|----------|-----------|
+| **Frontend** | Streamlit 1.30+ |
+| **LLM** | OpenAI GPT-4 |
+| **Embeddings** | OpenAI text-embedding-3-small |
+| **Vector Store** | FAISS |
+| **Framework** | LangChain |
+| **Language** | Python 3.11+ |
+| **Testing** | unittest, coverage |
+| **Document Parsing** | PyPDF2, python-docx, pdfplumber |
 
 ---
 
 ## 🤝 Contributing
 
-### Development Setup
+### Development Workflow
 
-```powershell
-# Install dev dependencies
-pip install -r requirements.txt
-
-# Run linting
-flake8 app.py rag_engine.py config.py utils.py
-
-# Format code
-black app.py rag_engine.py config.py utils.py
+1. **Create feature branch**
+```bash
+git checkout -b feature/your-feature-name
 ```
 
-### Code Style Guidelines
+2. **Make changes and test**
+```bash
+python -m unittest discover -s tests
+```
 
-- **PEP 8** compliance for Python code
-- **Docstrings** for all public functions
-- **Type hints** for function signatures (when possible)
-- **Error handling** with specific exception types
+3. **Commit with descriptive message**
+```bash
+git add .
+git commit -m "Feature: Add new functionality"
+```
+
+4. **Push and create PR**
+```bash
+git push origin feature/your-feature-name
+```
+
+### Code Style
+
+- Follow PEP 8 guidelines
+- Add docstrings to functions
+- Write tests for new features
+- Keep functions focused and small
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License. See `LICENSE` file for details.
+This project is for demonstration purposes. Hollard Insurance branding and content are property of Hollard Insurance Company.
 
 ---
 
-## 🙏 Acknowledgments
+## 🐛 Troubleshooting
 
-- **LangChain**: Excellent RAG framework and abstractions
-- **Streamlit**: Rapid prototyping for data applications
-- **OpenAI**: State-of-the-art embeddings and language models
-- **Facebook AI (Meta)**: FAISS vector search library
+### Common Issues
+
+**Issue**: `ModuleNotFoundError: No module named 'openai'`
+```bash
+pip install -r requirements.txt
+```
+
+**Issue**: `ValueError: not enough values to unpack`
+- Usually caused by Streamlit version mismatch
+- Run: `pip install --upgrade streamlit`
+
+**Issue**: No documents showing in sidebar
+- Check `data/documents/` folder exists
+- Verify files are .txt, .pdf, .docx, or .md
+- Check file permissions
+
+**Issue**: Vector store not updating
+- Delete `data/faiss_store/` folder
+- Restart app to rebuild
+
+**Issue**: OpenAI API errors
+- Verify API key in `.env` file
+- Check API quota/billing
+- Ensure stable internet connection
 
 ---
 
-## 📧 Support
+## 📞 Support
 
-For issues, questions, or feature requests:
-1. Check the **Troubleshooting** section above
-2. Review closed issues on GitHub
-3. Open a new issue with reproduction steps
+For issues related to:
+- **Application bugs**: Open a GitHub issue
+- **Hollard products**: Contact Hollard at 0860 103 933
+- **Insurance queries**: Use the broker finder at hollard.co.za/broker-tool
 
 ---
 
-**Built with ❤️ for intelligent document interaction**
+## 🎯 Roadmap
+
+Future enhancements:
+- [ ] Add callback form with email notifications
+- [ ] Implement live chat integration
+- [ ] Add analytics dashboard
+- [ ] Support for more document formats
+- [ ] Multi-language support
+- [ ] Voice input capability
+- [ ] Mobile app version
+
+---
+
+## 👨‍💻 Author
+
+Built by a junior developer learning RAG applications and insurance domain chatbots.
+
+**Repository**: https://github.com/Kayanja2023/Rag  
+**Branch**: feature/policy-assistant-poc
+
+---
+
+Made with ❤️ for Better Futures
