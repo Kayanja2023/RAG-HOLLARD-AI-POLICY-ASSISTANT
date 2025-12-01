@@ -109,59 +109,6 @@ tests/             - Unit tests (75 tests, 77% coverage)
 
 ---
 
-## Challenges I Faced
-
-### 1. Deployment Hell
-
-**Problem:** First deployment to Streamlit Cloud failed with "no API key" error.
-
-**What I learned:** Environment variables don't transfer from local .env files. Had to use Streamlit's Secrets feature.
-
-**Solution:** Added `OPENAI_API_KEY` to Streamlit Cloud dashboard under Secrets.
-
----
-
-### 2. Missing Knowledge Base
-
-**Problem:** Second deployment worked but had no answers - vector store was empty.
-
-**Root cause:** The `data/documents/` folder was in `.gitignore` so files never got pushed to GitHub.
-
-**Solution:**
-- Commented out `data/documents/` from `.gitignore`
-- Created all 5 markdown knowledge base files
-- Committed and pushed to GitHub
-- App rebuilt vector store on deployment
-
----
-
-### 3. Security Incident
-
-**Problem:** Accidentally exposed my OpenAI API key in chat when asking for help.
-
-**What I did:**
-- Immediately replaced key in `.env` with placeholder
-- Verified `.env` was never committed to git (it wasn't)
-- Advised to revoke exposed key at OpenAI platform
-- Created new API key
-
-**Lesson learned:** Never share `.env` file contents, even in support chats.
-
----
-
-### 4. UI Too Big
-
-**Problem:** Hiring manager said UI looked "cartoonish" with oversized icons and text.
-
-**Solution:** Went through 3 iterations of size reductions:
-- Reduced header from 45px to 30px logo
-- Reduced icons from 2rem to 1rem
-- Reduced button padding and font sizes
-- Tightened spacing throughout
-- Result: More professional, business-appropriate look
-
----
-
 ## Testing Approach
 
 I wrote 75 unit tests to make sure the core functionality works:
@@ -224,23 +171,6 @@ streamlit run app.py
 5. App auto-deploys on git push
 
 **Live URL:** ai-hollard.streamlit.app
-
----
-
-## What I'd Improve With More Time
-
-### Immediate Fixes
-- Fix the 5 failing Streamlit UI tests (mocking issues)
-- Add callback form that emails submissions to support team
-- Better error handling when OpenAI API is down
-- Loading states for document upload progress
-
-### Future Enhancements
-- **Analytics:** Track most-asked questions to improve knowledge base
-- **Multi-language:** Support Afrikaans, Zulu, Xhosa
-- **Voice Input:** For accessibility
-- **Live Chat Integration:** Connect handover to actual support system
-- **Better Search:** Implement hybrid search (keyword + semantic)
 
 ---
 
@@ -341,26 +271,6 @@ PyPDF2, python-docx        # Document parsing
 ```
 
 Total: 97 packages including dependencies
-
----
-
-## Questions I Can Answer
-
-**Technical:**
-- How does the RAG pipeline work?
-- Why did you choose FAISS over alternatives?
-- How does handover detection work?
-- What's the test coverage strategy?
-
-**Product:**
-- How do users interact with the assistant?
-- What happens when it doesn't know an answer?
-- How do you add new knowledge to the system?
-
-**Deployment:**
-- What issues did you face going to production?
-- How is it currently hosted?
-- What would it take to scale this?
 
 ---
 
