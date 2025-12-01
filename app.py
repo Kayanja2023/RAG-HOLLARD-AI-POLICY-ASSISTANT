@@ -215,109 +215,36 @@ def check_handover_needed(response_text: str) -> bool:
         "live agent",
         "human expertise",
         "hollard specialist",
-        "arrange a handover",
-        "speak with a broker",
-        "contact hollard directly"
+        "arrange a handover"
     ]
     return any(phrase.lower() in response_text.lower() for phrase in handover_phrases)
 
-def show_handover_options():
-    """Display handover options with styled buttons."""
+def show_handover_end():
+    """Display minimalistic handover end screen."""
     st.markdown("""
-        <div style='background: linear-gradient(135deg, #6B1E9E 0%, #5A1880 100%); 
-                    padding: 20px; border-radius: 16px; margin: 20px 0; color: white;'>
-            <h3 style='margin: 0 0 10px 0; color: white;'>🤝 Let's Connect You with the Right Person</h3>
-            <p style='margin: 0; opacity: 0.9;'>Choose how you'd like to continue:</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        if st.button("📞 Request Callback", use_container_width=True, type="primary"):
-            st.session_state.show_callback_form = True
-            st.rerun()
-    
-    with col2:
-        if st.button("💬 Live Chat", use_container_width=True):
-            st.info("🕐 Live chat available Mon-Fri, 8am-5pm. Outside hours, please request a callback.")
-    
-    with col3:
-        if st.button("🔍 Find a Broker", use_container_width=True):
-            st.markdown("""
-                <div style='background: #F9F5FC; padding: 16px; border-radius: 12px; border: 2px solid #6B1E9E;'>
-                    <h4 style='color: #6B1E9E; margin-top: 0;'>🔍 Find Your Local Broker</h4>
-                    <p>Connect with a trusted Hollard broker in your area for personalized assistance.</p>
-                    <a href='https://www.hollard.co.za/broker-tool' target='_blank' 
-                       style='display: inline-block; background: #6B1E9E; color: white; 
-                              padding: 10px 20px; border-radius: 8px; text-decoration: none; 
-                              font-weight: 600;'>Find a Broker →</a>
+        <div style='background: #F9F5FC; padding: 32px; border-radius: 12px; 
+                    border: 2px solid #6B1E9E; text-align: center; margin: 24px 0;'>
+            <div style='font-size: 3rem; margin-bottom: 16px;'>🤝</div>
+            <h3 style='color: #6B1E9E; margin: 0 0 12px 0;'>Session Ended</h3>
+            <p style='color: #666; margin: 0 0 24px 0; font-size: 1rem;'>
+                This conversation requires human assistance.
+            </p>
+            <div style='background: white; padding: 20px; border-radius: 8px; margin: 16px 0;'>
+                <p style='color: #5A1880; margin: 0 0 16px 0; font-weight: 600;'>Contact Options:</p>
+                <div style='text-align: left; color: #666;'>
+                    <p style='margin: 8px 0;'>📞 <strong>Phone:</strong> 0860 103 933</p>
+                    <p style='margin: 8px 0;'>✉️ <strong>Email:</strong> info@hollard.co.za</p>
+                    <p style='margin: 8px 0;'>🔍 <strong>Find a Broker:</strong> 
+                        <a href='https://www.hollard.co.za/broker-tool' target='_blank' 
+                           style='color: #6B1E9E; text-decoration: none;'>hollard.co.za/broker-tool</a>
+                    </p>
                 </div>
-            """, unsafe_allow_html=True)
-
-def show_callback_form():
-    """Display callback request form."""
-    st.markdown("""
-        <div style='background: #F9F5FC; padding: 20px; border-radius: 16px; border: 2px solid #6B1E9E;'>
-            <h3 style='color: #6B1E9E; margin-top: 0;'>📞 Request a Callback</h3>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    with st.form("callback_form"):
-        name = st.text_input("Full Name *", placeholder="John Doe")
-        phone = st.text_input("Phone Number *", placeholder="+27 XX XXX XXXX")
-        email = st.text_input("Email Address *", placeholder="john@example.com")
-        query_type = st.selectbox(
-            "What do you need help with? *",
-            ["Get a Quote", "Make a Purchase", "File a Claim", "Policy Changes", 
-             "Complaint", "General Inquiry", "Other"]
-        )
-        preferred_time = st.selectbox(
-            "Preferred Callback Time",
-            ["Morning (8am-12pm)", "Afternoon (12pm-5pm)", "Any Time"]
-        )
-        message = st.text_area("Additional Details", placeholder="Please provide any additional information...")
-        
-        col1, col2 = st.columns([1, 4])
-        with col1:
-            submitted = st.form_submit_button("Submit", use_container_width=True, type="primary")
-        with col2:
-            if st.form_submit_button("Cancel", use_container_width=True):
-                st.session_state.show_callback_form = False
-                st.rerun()
-        
-        if submitted:
-            if not name or not phone or not email:
-                st.error("Please fill in all required fields (*)")
-            else:
-                # Save callback request
-                import json
-                from datetime import datetime
-                
-                callback_data = {
-                    "timestamp": datetime.now().isoformat(),
-                    "name": name,
-                    "phone": phone,
-                    "email": email,
-                    "query_type": query_type,
-                    "preferred_time": preferred_time,
-                    "message": message,
-                    "conversation_context": st.session_state.messages[-5:] if len(st.session_state.messages) > 0 else []
-                }
-                
-                # Create handovers directory if it doesn't exist
-                import os
-                os.makedirs("data/handovers", exist_ok=True)
-                
-                # Save to JSON file
-                filename = f"data/handovers/callback_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                with open(filename, 'w') as f:
-                    json.dump(callback_data, f, indent=2)
-                
-                st.success("✅ Callback request submitted! A Hollard representative will contact you soon.")
-                st.session_state.show_callback_form = False
-                st.balloons()
-                st.rerun()
+    # Disable further chat
+    st.session_state.handover_triggered = True
 
 def show_header():
     st.markdown("""
@@ -528,52 +455,64 @@ show_welcome_message(docs_exist=bool(docs), messages_exist=bool(st.session_state
 if st.session_state.messages:
     if st.button("🗑️ Clear Chat History"):
         st.session_state.messages = []
+        st.session_state.handover_triggered = False
         # Also clear the LangChain message history
         if "session_histories" in st.session_state:
             st.session_state.session_histories = {}
         st.rerun()
 
-# Display all previous messages
-for message in st.session_state.messages:
-    avatar = "👤" if message["role"] == "user" else "🛡️"
-    with st.chat_message(message["role"], avatar=avatar):
-        st.write(message["content"])
-
-# Show callback form if requested
-if st.session_state.get('show_callback_form', False):
-    show_callback_form()
-
-# Chat input - disabled if no documents
-if not chain:
-    st.info("👋 Upload documents to start chatting!")
-    # Display disabled input to show chat is unavailable
-    st.chat_input("Upload documents first...", disabled=True)
-elif user_input := st.chat_input("Ask about Hollard products or policies..."):
-    # Add user message to session state and display it
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user", avatar="👤"):
-        st.write(user_input)
+# Check if handover was triggered
+if st.session_state.get('handover_triggered', False):
+    # Display messages up to handover
+    for message in st.session_state.messages:
+        avatar = "👤" if message["role"] == "user" else "🛡️"
+        with st.chat_message(message["role"], avatar=avatar):
+            st.write(message["content"])
     
-    # Generate and display assistant response
-    with st.chat_message("assistant", avatar="🛡️"):
-        try:
-            with st.spinner("🔍 Analyzing your documents..."):
-                response = chain.invoke(
-                    {"input": user_input},
-                    config={"configurable": {"session_id": "main"}}
-                )
-            # The response is already a string due to StrOutputParser
-            st.write(response)
-            # Add assistant message to session state
-            st.session_state.messages.append({"role": "assistant", "content": response})
-            
-            # Check if handover is needed
-            if check_handover_needed(response):
-                show_handover_options()
-        except Exception as e:
-            error_msg = f"Error: {str(e)}"
-            st.error(error_msg)
-            import traceback
-            st.error(traceback.format_exc())
-            # Add error to session state so it persists
-            st.session_state.messages.append({"role": "assistant", "content": error_msg})
+    # Show handover end screen
+    show_handover_end()
+    
+    # Disable chat input
+    st.chat_input("Session ended - Please contact Hollard directly", disabled=True)
+    
+else:
+    # Display all previous messages
+    for message in st.session_state.messages:
+        avatar = "👤" if message["role"] == "user" else "🛡️"
+        with st.chat_message(message["role"], avatar=avatar):
+            st.write(message["content"])
+
+    # Chat input - disabled if no documents
+    if not chain:
+        st.info("👋 Upload documents to start chatting!")
+        st.chat_input("Upload documents first...", disabled=True)
+    elif user_input := st.chat_input("Ask about Hollard products or policies..."):
+        # Add user message to session state and display it
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user", avatar="👤"):
+            st.write(user_input)
+        
+        # Generate and display assistant response
+        with st.chat_message("assistant", avatar="🛡️"):
+            try:
+                with st.spinner("🔍 Analyzing your documents..."):
+                    response = chain.invoke(
+                        {"input": user_input},
+                        config={"configurable": {"session_id": "main"}}
+                    )
+                # The response is already a string due to StrOutputParser
+                st.write(response)
+                # Add assistant message to session state
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                
+                # Check if handover is needed and end session
+                if check_handover_needed(response):
+                    st.session_state.handover_triggered = True
+                    st.rerun()
+            except Exception as e:
+                error_msg = f"Error: {str(e)}"
+                st.error(error_msg)
+                import traceback
+                st.error(traceback.format_exc())
+                # Add error to session state so it persists
+                st.session_state.messages.append({"role": "assistant", "content": error_msg})
